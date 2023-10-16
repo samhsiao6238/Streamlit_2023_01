@@ -13,7 +13,8 @@ class Constants:
 def initialize_firebase():
     try:
         firebase_admin.get_app()
-    except ValueError as e:
+        return True  # 如果Firebase已初始化，则直接返回True
+    except ValueError as e:  # 没有初始化应用程序时，继续以下过程
         if 'STREAMLIT_PUBLIC_PATH' in os.environ:  # 判斷是否在 Streamlit 服務器上
             try:
                 firebase_config_str = st.secrets[Constants.ST_FIREBASE_CONFIG_STR]
@@ -22,18 +23,26 @@ def initialize_firebase():
             except Exception as e:
                 st.error(f'解析服務器上的憑證出錯：{e}')
                 return False
-        else:
+        else:  # 本地环境
             try:
-                with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
+                # 由于您没有在本地使用secrets.toml，因此需要一个本地JSON文件路径。这里假设你已经有了这个文件。
+                with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:  # 确保此路径指向您的本地Firebase JSON文件
                     cred_info = json.load(f)
                 cred = credentials.Certificate(cred_info)
+            except FileNotFoundError as e:
+                st.error(f'未找到本地Firebase憑證，請確保路徑正確並且文件存在。錯誤訊息：{e}')
+                return False
             except Exception as e:
                 st.error(f'讀取本地 Firebase 憑證出錯，錯誤訊息：{e}')
                 return False
 
-        firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
-        })
+        try:
+            firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
+            })
+        except Exception as e:
+            st.error(f'Firebase初始化失敗：{e}')
+            return False
     return True
 
 # Streamlit 主要內容
@@ -72,3 +81,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
