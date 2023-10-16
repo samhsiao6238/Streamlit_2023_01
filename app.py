@@ -2,29 +2,24 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 import json
-import os
-
-# 常數：環境使用
-class Constants:
-    # Streamlit 環境參數
-    ST_FIREBASE_CONFIG_STR = 'FIREBASE_CONFIG_STR'
 
 # 初始化 Firebase 
 def initialize_firebase():
     try:
-        firebase_admin.get_app()
+        firebase_admin.get_app()  # 若已初始化，直接返回
     except ValueError as e:
-        if 'STREAMLIT_PUBLIC_PATH' in os.environ:  # 判斷是否在 Streamlit 服務器上
+        # 先嘗試從 Streamlit Secrets 讀取憑證
+        firebase_config_str = st.secrets.get('FIREBASE_CONFIG_STR', None)
+        if firebase_config_str:
             try:
-                firebase_config_str = st.secrets[Constants.ST_FIREBASE_CONFIG_STR]
                 cred_info = json.loads(firebase_config_str)
                 cred = credentials.Certificate(cred_info)
             except Exception as e:
-                st.error(f'解析服務器上的憑證出錯：{e}')
+                st.error(f'解析 Streamlit Secrets 上的憑證出錯：{e}')
                 return False
         else:
+            # 嘗試從本地檔案讀取憑證
             try:
-                # 這部分只有在本地運行時才會執行
                 with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
                     cred_info = json.load(f)
                 cred = credentials.Certificate(cred_info)
@@ -36,7 +31,6 @@ def initialize_firebase():
             'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
         })
     return True
-
 
 # Streamlit 主要內容
 def main():
@@ -74,4 +68,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
