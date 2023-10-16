@@ -1,22 +1,28 @@
 import streamlit as st
 import json
 import os
+import firebase_admin
+from firebase_admin import credentials, db
 
 def main():
-    st.title("檢查並讀取 Streamlit Secrets 或 Firebase JSON 檔")
+    st.title("從 Firebase 讀取資料並在 Streamlit 顯示")
 
-    # # 如果在 Streamlit Sharing 雲端服務上運行
-    # if (True):
-    #     db_username = st.secrets['db_username']
-    #     db_password = st.secrets['db_password']
-    # else:  # 本地運行
-    #     with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
-    #         firebase_data = json.load(f)
-    #         db_username = firebase_data.get('db_username')  # 這裡的鍵名取決於您的 JSON 檔結構
-    #         db_password = firebase_data.get('db_password')  # 這裡的鍵名取決於您的 JSON 檔結構
+    # 初始化 Firebase Admin
+    if not firebase_admin._apps:
+        firebase_config_str = st.secrets['FIREBASE_CONFIG_STR']
+        firebase_config = json.loads(firebase_config_str)
+        
+        cred = credentials.Certificate(firebase_config)
+        firebase_admin.initialize_app(cred, {
+            'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
+        })
 
-    # st.write(f"DB 使用者名稱: {db_username}")
-    # st.write(f"DB 密碼: {'*' * len(db_password) if db_password else None}")  # 顯示為星號以保密
+    # 讀取 Firebase 實時資料庫的資料
+    ref = db.reference('/')
+    data = ref.get()
+
+    # 在 Streamlit 上顯示資料
+    st.json(data)
 
 if __name__ == "__main__":
     main()
