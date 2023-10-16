@@ -8,14 +8,14 @@ def main():
     st.title("從 Firebase 讀取資料並在 Streamlit 顯示")
 
     # 初始化 Firebase Admin
-    if not firebase_admin._apps:
-        firebase_config_str = st.secrets['FIREBASE_CONFIG_STR']
-        firebase_config = json.loads(firebase_config_str)
+    firebase_config_str = st.secrets['FIREBASE_CONFIG_STR']
+    firebase_config = json.loads(firebase_config_str)
         
-        cred = credentials.Certificate(firebase_config)
-        firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
-        })
+    cred = credentials.Certificate(firebase_config)
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    })
+        
 
     # 讀取 Firebase 實時資料庫的資料
     ref = db.reference('/')
