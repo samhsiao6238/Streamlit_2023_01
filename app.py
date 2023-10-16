@@ -40,15 +40,19 @@ def main():
         st.error("Firebase 初始化失敗！")
         return
 
+    # 初始化 session state
+    if 'amount' not in st.session_state:
+        st.session_state.amount = 0
+
     # Slider and Label
-    amount = st.slider("金額", 0, 100)
-    st.write(f"選擇的金額是：{amount}")
+    st.session_state.amount = st.slider("金額", 0, 100, st.session_state.amount)
+    st.write(f"選擇的金額是：{st.session_state.amount}")
 
     # 寫入
     def write_to_firebase():
         ref = db.reference('data')
         ref.set({
-            '金額': amount
+            '金額': st.session_state.amount
         })
 
     # 讀取
@@ -65,7 +69,8 @@ def main():
     # 按鈕
     if st.button("讀取 Firebase"):
         data = read_from_firebase()
-        if data:
+        if data and '金額' in data:
+            st.session_state.amount = data['金額']
             st.write(data)
         else:
             st.warning("Firebase 節點上無資料!")
