@@ -22,7 +22,7 @@ def main():
     data = ref.get()
 
     # 在 Streamlit 上顯示資料
-    # st.json(data)
+    st.json(data)
 
 if __name__ == "__main__":
     # st.write(st.secrets)
