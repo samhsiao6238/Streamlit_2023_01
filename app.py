@@ -1,5 +1,6 @@
 import os
 import json
+from google.oauth2 import service_account
 import streamlit as st
 from firebase_admin import credentials, db, initialize_app
 import firebase_admin
@@ -86,7 +87,7 @@ def initialize_firebase():
         else:
             try:
                 # 如果在本地運行，從檔案讀取憑證
-                PATH = "myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json"
+                PATH = "myproject01-be1b7-firebase-adminsdk-1mh85-36f2d814a2.json"
                 with open(PATH) as json_file:
                     cred_info = json.load(json_file)
                 cred = credentials.Certificate(cred_info)
