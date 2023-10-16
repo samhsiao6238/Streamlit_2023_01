@@ -44,8 +44,10 @@ def main():
     if 'amount' not in st.session_state:
         st.session_state.amount = 0
 
-    # Slider and Label
-    st.session_state.amount = st.slider("金額", 0, 100, st.session_state.amount)
+    # Slider container
+    slider_container = st.empty()
+    st.session_state.amount = slider_container.slider("金額", 0, 100, st.session_state.amount)
+
     st.write(f"選擇的金額是：{st.session_state.amount}")
 
     # 寫入
@@ -71,6 +73,7 @@ def main():
         data = read_from_firebase()
         if data and '金額' in data:
             st.session_state.amount = data['金額']
+            slider_container.slider("金額", 0, 100, st.session_state.amount)  # Refresh the slider
             st.write(data)
         else:
             st.warning("Firebase 節點上無資料!")
