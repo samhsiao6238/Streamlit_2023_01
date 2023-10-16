@@ -48,7 +48,9 @@ def main():
     slider_container = st.empty()
     st.session_state.amount = slider_container.slider("金額", 0, 100, st.session_state.amount)
 
-    st.write(f"選擇的金額是：{st.session_state.amount}")
+    # Label container
+    label_container = st.empty()
+    label_container.write(f"選擇的金額是：{st.session_state.amount}")
 
     # 寫入
     def write_to_firebase():
@@ -74,6 +76,7 @@ def main():
         if data and '金額' in data:
             st.session_state.amount = data['金額']
             slider_container.slider("金額", 0, 100, st.session_state.amount)  # Refresh the slider
+            label_container.write(f"選擇的金額是：{st.session_state.amount}")  # Refresh the label
             st.write(data)
         else:
             st.warning("Firebase 節點上無資料!")
