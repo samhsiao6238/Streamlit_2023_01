@@ -1,9 +1,8 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-import numpy as np
-st.title('Streamlit 與 Matplotlib')
-fig, ax = plt.subplots()
-x = np.linspace(0, 20, 100)
-ax.plot(x, np.sin(x))
-st.pyplot(fig)
-st.write('這是一個使用 Matplotlib 在 Streamlit 上繪製的線圖。')
+import os
+
+st.write("DB 使用者名稱:", st.secrets["db_username"])
+st.write("DB 密碼:", st.secrets["db_password"])
+st.write("私密的項目清單", st.secrets["secrets"]["items"])
+#
+st.write("這部分是觀察 os 設定值與 st 設定值是否一致", os.environ["db_username"] == st.secrets["db_username"])
