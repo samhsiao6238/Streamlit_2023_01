@@ -5,8 +5,8 @@ def main():
     st.title("檢查並讀取 Streamlit Secrets")
     
     # 讀取 db_username 和 db_password
-    db_username = st.secrets.get('db_username', None)
-    db_password = st.secrets.get('db_password', None)
+    db_username = st.secrets['db_username']
+    db_password = st.secrets['db_password']
 
     st.write(f"DB 使用者名稱: {db_username}")
     st.write(f"DB 密碼: {'*' * len(db_password) if db_password else None}")  # 顯示為星號以保密
