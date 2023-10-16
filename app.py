@@ -6,7 +6,7 @@ def main():
     st.title("檢查並讀取 Streamlit Secrets 或 Firebase JSON 檔")
 
     # 如果在 Streamlit Sharing 雲端服務上運行
-    if os.environ.get("STREAMLIT_SHARING") == "true":
+    if (True):
         db_username = st.secrets['db_username']
         db_password = st.secrets['db_password']
     else:  # 本地運行
