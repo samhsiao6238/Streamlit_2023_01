@@ -6,7 +6,7 @@ def main():
     st.title("檢查並讀取 Streamlit Secrets")
 
     # 判斷是否在 Streamlit Sharing 或其他平台上運行
-    if 'STREAMLIT_SHARING' in os.environ or 'DEPLOYMENT_PLATFORM' in os.environ: 
+    if os.environ.get('STREAMLIT_SHARING', '').lower() == 'true' or os.environ.get('DEPLOYMENT_PLATFORM', '').lower() == 'true':
 
         # 讀取 db_username 和 db_password
         db_username = st.secrets.get('db_username', None)
