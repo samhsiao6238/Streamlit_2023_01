@@ -26,5 +26,6 @@ def main():
 
 if __name__ == "__main__":
     # st.write(st.secrets)
-    # main()
+    
     st.title("這是 main")
+    main()
