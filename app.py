@@ -40,11 +40,15 @@ def main():
         st.error("Firebase 初始化失敗！")
         return
 
+    # Slider and Label
+    amount = st.slider("金額", 0, 100)
+    st.write(f"選擇的金額是：{amount}")
+
     # 寫入
     def write_to_firebase():
         ref = db.reference('data')
         ref.set({
-            'example_key': 'Hello, Firebase!'
+            '金額': amount
         })
 
     # 讀取
