@@ -9,9 +9,9 @@ def main():
 
     # 初始化 Firebase Admin
     firebase_config_str = st.secrets["FIREBASE_CONFIG_STR"]
-    st.write(firebase_config_str)
+    # st.write(firebase_config_str)
     firebase_config = json.loads(firebase_config_str)
-    st.write(firebase_config)
+    # st.write(firebase_config)
         
     cred = credentials.Certificate(firebase_config)
     firebase_admin.initialize_app(cred, {
