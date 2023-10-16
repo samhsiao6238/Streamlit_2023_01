@@ -8,7 +8,7 @@ def main():
     st.write("從 Firebase 讀取資料並在 Streamlit 顯示")
 
     # 初始化 Firebase Admin
-    firebase_config_str = st.secrets['FIREBASE_CONFIG_STR']
+    firebase_config_str = st.secrets["FIREBASE_CONFIG_STR"]
     st.write(firebase_config_str)
     firebase_config = json.loads(firebase_config_str)
     st.write(firebase_config)
