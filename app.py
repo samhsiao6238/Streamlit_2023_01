@@ -1,87 +1,26 @@
-# 導入
+'''
+pip install toml
+'''
+
 import streamlit as st
-import firebase_admin
-from firebase_admin import credentials, db
-import json
+import os
+import toml
 
-# 初始化 Firebase 
-def initialize_firebase():
-    try:
-        # 假如已完成初始化，這裡將可以取得應用，所以會直接返回
-        firebase_admin.get_app()  
-    except ValueError as e:
-        # 先嘗試從 Streamlit Secrets 讀取憑證
-        firebase_config_str = st.secrets.get('FIREBASE_CONFIG_STR', None)
-        if firebase_config_str:
-            try:
-                cred_info = json.loads(firebase_config_str)
-                cred = credentials.Certificate(cred_info)
-            except Exception as e:
-                st.error(f'解析 Streamlit Secrets 上的憑證出錯：{e}')
-                return False
-        else:
-            # 嘗試從本地檔案讀取憑證
-            try:
-                with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
-                    cred_info = json.load(f)
-                cred = credentials.Certificate(cred_info)
-            except Exception as e:
-                st.error(f'讀取本地 Firebase 憑證出錯，錯誤訊息：{e}')
-                return False
-        # 初始化
-        firebase_admin.initialize_app(cred, {
-            'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
-        })
-    return True
+# 檢查是否存在標識本地運行的檔案
+if os.path.exists(".LOCAL"):
+    # 在本地運行
+    with open("secrets.toml", "r") as file:
+        st.secrets = toml.load(file)
+else:
+    # 在伺服器上運行，Streamlit 會自動載入默認的 secrets.toml
+    pass
 
-# Streamlit 主要內容
-def main():
-    # 標題
-    st.title("Streamlit & Firebase 整合範例")
-    # 這裡會先調用 initialize_firebase()
-    # 再檢查回傳值來判斷 Firebase 的初始化是否成功
-    if not initialize_firebase():
-        st.error("Firebase 初始化失敗！")
-        return
-
-    # 初始化 session state
-    if 'amount' not in st.session_state:
-        st.session_state.amount = 0
-
-    # Slider
-    st.session_state.amount = st.slider("金額", 0, 100, st.session_state.amount, key='unique_slider_key')
-
-    # Label container
-    label_container = st.empty()
-    label_container.write(f"選擇的金額是：{st.session_state.amount}")
-
-    # 函數：寫入 firebase
-    def write_to_firebase():
-        ref = db.reference('data')
-        ref.set({
-            '金額': st.session_state.amount
-        })
-
-    # 函數：讀取 firebase
-    def read_from_firebase():
-        ref = db.reference('data')
-        data = ref.get()
-        return data
-
-    # 按鈕
-    if st.button("寫入 Firebase"):
-        write_to_firebase()
-        st.success("完成寫入到 Firebase 節點！")
-
-    # 按鈕
-    if st.button("讀取 Firebase"):
-        data = read_from_firebase()
-        if data and '金額' in data:
-            st.session_state.amount = data['金額']
-            st.experimental_rerun()  # Re-run the entire app to update the slider and other elements
-        else:
-            st.warning("Firebase 節點上無資料!")
-
+st.write("DB 使用者名稱:", st.secrets["db_username"])
+st.write("DB 密碼:", st.secrets["db_password"])
 # 
-if __name__ == "__main__":
-    main()
+st.write("私密的項目清單", st.secrets["secrets"]["items"])
+#
+st.write("從項目清單取出指定的第二個物件:", st.secrets["secrets"]["items"][1])
+#
+if not os.path.exists(".LOCAL"):
+    st.write("這部分是觀察 os 設定值與 st 設定值是否一致", os.environ["db_username"] == st.secrets["db_username"])
