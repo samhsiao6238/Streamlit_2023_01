@@ -3,3 +3,4 @@ secrets.txt
 secrets.toml
 .streamlit/secrets.toml
 .LOCAL
+.streamlit

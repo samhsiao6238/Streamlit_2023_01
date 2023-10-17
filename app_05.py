@@ -20,7 +20,7 @@ def initialize_firebase():
         else:
             # 嘗試從本地檔案讀取憑證
             try:
-                with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
+                with open('myproject01-be1b7-firebase-adminsdk-1mh85-36f2d814a2.json', 'r') as f:
                     cred_info = json.load(f)
                 cred = credentials.Certificate(cred_info)
             except Exception as e:
