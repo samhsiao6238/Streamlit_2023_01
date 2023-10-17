@@ -236,9 +236,11 @@ def main():
         # 假如「不在教室」
         if not st.session_state[Constants.IN_CLASSROOM]:
             # 顯示為「簽到系統」
-            st.session_state[Constants.PH_TITLE_MAIN].title('==簽到系統==')
+            # st.session_state[Constants.PH_TITLE_MAIN].title('==簽到系統==')
+            st.subheader('簽到系統', divider='rainbow')
         else:   # 假如在教室
-            st.session_state[Constants.PH_TITLE_MAIN].title('==上課系統==')
+            # st.session_state[Constants.PH_TITLE_MAIN].title('==上課系統==')
+            st.subheader('上課系統', divider='rainbow')
             #
             handle_classroom_status(st.session_state.seat_number)
 
