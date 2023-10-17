@@ -1,50 +1,87 @@
+# 導入
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, db
 import json
 
-# 讀取憑證
-try:
-    # 嘗試載入權證，假如是在本地運行則會讀取到
-    with open('myproject01-be1b7-firebase-adminsdk-1mh85-36f2d814a2.json', 'r') as f:
-        FIREBASE_CONFIG_STR = json.load(f)
-except FileNotFoundError:
-    # 找不到就從服務器上讀取
-    FIREBASE_CONFIG_STR = st.secrets["FIREBASE_CONFIG_STR"]
+# 初始化 Firebase 
+def initialize_firebase():
+    try:
+        # 假如已完成初始化，這裡將可以取得應用，所以會直接返回
+        firebase_admin.get_app()  
+    except ValueError as e:
+        # 先嘗試從 Streamlit Secrets 讀取憑證
+        firebase_config_str = st.secrets.get('FIREBASE_CONFIG_STR', None)
+        if firebase_config_str:
+            try:
+                cred_info = json.loads(firebase_config_str)
+                cred = credentials.Certificate(cred_info)
+            except Exception as e:
+                st.error(f'解析 Streamlit Secrets 上的憑證出錯：{e}')
+                return False
+        else:
+            # 嘗試從本地檔案讀取憑證
+            try:
+                with open('myproject01-be1b7-firebase-adminsdk-1mh85-3ede5c2672.json', 'r') as f:
+                    cred_info = json.load(f)
+                cred = credentials.Certificate(cred_info)
+            except Exception as e:
+                st.error(f'讀取本地 Firebase 憑證出錯，錯誤訊息：{e}')
+                return False
+        # 初始化
+        firebase_admin.initialize_app(cred, {
+            'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
+        })
+    return True
 
-# 初始化 Firebase Admin SDK
-if not firebase_admin._apps:
-    #
-    cred = credentials.Certificate(FIREBASE_CONFIG_STR)
-    firebase_admin.initialize_app(cred, {
-        'databaseURL': 'https://myproject01-be1b7-default-rtdb.asia-southeast1.firebasedatabase.app/'
-    })
+# Streamlit 主要內容
+def main():
+    # 標題
+    st.title("Streamlit & Firebase 整合範例")
+    # 這裡會先調用 initialize_firebase()
+    # 再檢查回傳值來判斷 Firebase 的初始化是否成功
+    if not initialize_firebase():
+        st.error("Firebase 初始化失敗！")
+        return
 
+    # 初始化 session state
+    if 'amount' not in st.session_state:
+        st.session_state.amount = 0
 
-# 寫入
-def write_to_firebase():
-    ref = db.reference('data')
-    ref.set({
-        '新人報到': 'Hello, Firebase!'
-    })
+    # Slider
+    st.session_state.amount = st.slider("金額", 0, 100, st.session_state.amount, key='unique_slider_key')
 
-# 讀取
-def read_from_firebase():
-    ref = db.reference('data')
-    data = ref.get()
-    return data
+    # Label container
+    label_container = st.empty()
+    label_container.write(f"選擇的金額是：{st.session_state.amount}")
 
-# Streamlit 網站內容
-# 標題
-st.title("Streamlit & Firebase 整合範例")
-# 按鈕
-if st.button("寫入 Firebase"):
-    write_to_firebase()
-    st.success("完成寫入到 Firebase 節點！")
-# 按鈕
-if st.button("讀取 Firebase"):
-    data = read_from_firebase()
-    if data:
-        st.write(data)
-    else:
-        st.warning("Firebase 節點上無資料!")
+    # 函數：寫入 firebase
+    def write_to_firebase():
+        ref = db.reference('data')
+        ref.set({
+            '金額': st.session_state.amount
+        })
+
+    # 函數：讀取 firebase
+    def read_from_firebase():
+        ref = db.reference('data')
+        data = ref.get()
+        return data
+
+    # 按鈕
+    if st.button("寫入 Firebase"):
+        write_to_firebase()
+        st.success("完成寫入到 Firebase 節點！")
+
+    # 按鈕
+    if st.button("讀取 Firebase"):
+        data = read_from_firebase()
+        if data and '金額' in data:
+            st.session_state.amount = data['金額']
+            st.experimental_rerun()  # Re-run the entire app to update the slider and other elements
+        else:
+            st.warning("Firebase 節點上無資料!")
+
+# 
+if __name__ == "__main__":
+    main()
